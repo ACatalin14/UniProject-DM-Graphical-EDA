@@ -1,0 +1,181 @@
+---
+title: "Graphical EDA I: continous data"
+author: Team 1
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: slidy_presentation
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(include = TRUE, echo = TRUE)
+```
+
+## Structure
+
+**1. Examining Continuous Variables**
+
+**2. Looking for Structure: Dependency Relationships and Associations**
+
+**3. Investigating Multivariate Continuous Data**
+
+*3.1. Introduction*
+
+*3.2. What is a parallel coordinate plot (pcp)?*
+
+*3.3. Features you can see with parallel coordinate plots*
+
+*3.4. Interpreting clustering results*
+
+*3.5. Parallel coordinate plots and time series*
+
+*3.6. Parallel coordinate plots for indices*
+
+*3.7. Options for parallel coordinate plots*
+
+*3.8. Main points*
+
+
+## 1. Examining Continuous Variables
+
+## 2. Looking for Structure: Dependency Relationships and Associations
+
+## 3. Investigating Multivariate Continuous Data
+
+### **3.1. Introduction**
+
+#### Traditional methods used for displaying multivariate continous data:
+- **scatterplots**. *Disadvantage:* only for bivariate data, not effective for exploring in higher dimensions;
+- **matrices of scatterplots**. *Disadvantage:* do not really convey what multivariate structure there might be in the data;
+- **dimension reduction methods (PCA, MDS, etc).** *Disadvantage:* they approximate the data, and it is difficult to assess how good the approximations are.
+
+#### **New Method**: parallel coordinate plots. 
+#### This solution has become popular for multivariate continuous data in recent years.
+
+## **3.2. What is a parallel coordinate plot (pcp)?**
+
+```{r fig.width=10,fig.height=5}
+library('GGally'); data(food, package="MMST")
+names(food) <- c("Fat", "Food.energy", "Carbohyd", "Protein", "Cholest", "Wt", "Satur.Fat")
+# food1 <- food/food$Wt
+food1 <- head(food, 10)/head(food, 10)$Wt
+# TODO: sterge linia de deasupra si decomenteaza pe cealalta
+# TODO: pt un plot mai plin si mai mult timp de asteptat la build
+ggparcoord(data = food1, columns=c(1:5, 7), scale="uniminmax", alphaLines=0.2) + 
+  xlab("") + ylab("")
+```
+
+#### In a parallel coordinate plot:
+- all axes are parallel to one another;
+- each variable has its own individual vertical axis (or alternatively all the axes are horizontal);
+- each axis is usually scaled from the minimum to the maximum case values for the variable;
+- each polygonal line across all axes defines a ***profile***.
+
+\
+
+#### **Functions for drawing pcp's in R**
+
+| function       | package |
+|----------------|---------|
+| *ggparcoord*   | GGally  |
+| *parcoord*     | MASS    |
+| *cparcoord*    | gclus   |
+| *pcp*          | PairViz |
+| *parallelplot* | lattice |
+| *parallel.ade* | epade   |
+| *ipcp*         | iplots  |
+| *...*          | ...     |
+
+## **3.3. Features you can see with parallel coordinate plots**
+
+#### Parallel coordinate plots are very useful for checking results like:
+- outliers
+- groups of cases with very similar values (**clusters**)
+- bivariate associations between adjacent variables (**correlations**)
+- gaps or concentrations of data
+- skewness of univariate distributions for several variables at once
+
+\
+
+#### **Illustrating Fisher’s iris dataset**
+```{r fig.width=10,fig.height=5}
+ggparcoord(iris, columns=1:4, groupColumn="Species")
+```
+
+## **3.4. Interpreting clustering results**
+
+#### We can compare the clusters graphically with a pcp in which the clusters are given different colours.
+
+#### In the **USArrests** dataset from 1973, the *Assault* variable separates the clusters, because it has a larger range of values than the other three variables.
+
+```{r fig.width=10,fig.height=5}
+hcav <- hclust(dist(USArrests), method="ave")
+clu3 <- cutree(hcav, k=3)
+clus <- factor(clu3)
+usa1 <- cbind(USArrests, clus)
+ggparcoord(usa1, columns=1:4, groupColumn="clus", scale="uniminmax") + 
+  xlab("") + ylab("") + 
+  theme(legend.position = "none") +
+  geom_line(size = 1.1)
+ggparcoord(usa1, columns=1:4, groupColumn="clus", scale="globalminmax") + 
+  xlab("") + ylab("") + 
+  theme(legend.position = "none") +
+  geom_line(size = 1.1)
+```
+
+## **3.5. Parallel coordinate plots and time series**
+
+#### In a parallel coordinate plot used for representing time series:
+- each axis represents one of the time points;
+- we cannot change the order of the axis;
+- a common scaling is used for all axes (**scale**=*globalminmax*).
+
+**Note:** *ipcp* method of **iplots** package is better for creating interactive time series pcp's.
+
+\
+
+#### **Illustrating the acres of corn planted by US states from 1866 to 2011**
+```{r fig.width=10,fig.height=5}
+library(reshape2); data(nass.corn, package="agridat")
+c1 <- melt(nass.corn, id=c("year", "state"))
+c1 <- within(c1, StateV <- interaction(state, variable))
+c2 <- dcast(c1, StateV~year)
+ggparcoord(subset(c2[1:48,], c2[1:48,147]> 250000), columns=2:147, groupColumn="StateV", scale="globalminmax") + 
+  xlab("Year") + ylab("Acres") + 
+  scale_x_discrete(breaks=seq(1865, 2015, 10)) + 
+  theme(legend.position = "none")
+```
+
+## **3.6. Parallel coordinate plots for indices**
+
+#### Usually, index values are weighted combinations of the values of their components. Examples:
+- **stock market indices** - used to represent performances of groups of shares;
+- **consumer price index** - summarises prices across a wide range of products;
+- **average teaching score** - an overall index used for ranking universities in UK.
+
+#### One way to represent them in pcp's:
+- the index itself will have one axes associated;
+- for each of the components there will be a seperate axes;
+- the polygonal lines are the profiles of the individuals;
+- more effective if some individuals or groups are identified by colour.
+
+\
+
+#### **Illustrating the Russell group from the *uniranks* dataset**
+```{r fig.width=10,fig.height=5}
+data(uniranks, package="GDAdata")
+names(uniranks)[c(5, 6, 8, 10, 11, 13)] <- c("AvTeach", "NSSTeach", "SpendperSt", "Careers", "VAddScore", "NSSFeedb")
+uniranks1 <- within(uniranks, StaffStu <- 1/(StudentStaffRatio))
+uniranks2 <- within(uniranks1,
+                    Rus <- ifelse(UniGroup=="Russell", "Russell", "not"))
+ggparcoord(uniranks2[order(uniranks2$Rus, decreasing=FALSE),],
+           columns=c(5:8, 10:14),
+           order=c(5,12,8,9,14,6,13,7,11,10),
+           groupColumn="Rus", scale="uniminmax") +
+           xlab("") + ylab("") +
+           theme(legend.position = "none",
+           axis.ticks.y = element_blank(),
+           axis.text.y = element_blank()) +
+           scale_colour_manual(values = c("gray","red")) + 
+           geom_line(size = 0.8)
+```
+
+# THANK YOU!
