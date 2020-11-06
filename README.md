@@ -14,4 +14,6 @@ install.packages('GDAdata')
 install.packages('gclus')
 install.packages('gridExtra')
 install.packages('dplyr')
+install.packages('VGAMdata)
+install.packages('UsingR')
 ```
