@@ -6,7 +6,7 @@ output: slidy_presentation
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(include = TRUE, echo = TRUE, warning=FALSE)
+knitr::opts_chunk$set(include = TRUE, echo = TRUE, warning = FALSE)
 ```
 
 ## Structure
@@ -49,9 +49,7 @@ knitr::opts_chunk$set(include = TRUE, echo = TRUE, warning=FALSE)
 
 *2.9. Main points*
 
-
 **3. Investigating Multivariate Continuous Data**
-
 
 *3.1. Introduction*
 
@@ -59,15 +57,13 @@ knitr::opts_chunk$set(include = TRUE, echo = TRUE, warning=FALSE)
 
 *3.3. Features you can see with parallel coordinate plots*
 
-*3.4. Interpreting clustering results*
+*3.4. Parallel coordinate plots and time series*
 
-*3.5. Parallel coordinate plots and time series*
+*3.5. Parallel coordinate plots for indices*
 
-*3.6. Parallel coordinate plots for indices*
+*3.6. Options for parallel coordinate plots*
 
-*3.7. Options for parallel coordinate plots*
-
-*3.8. Main points*
+*3.7. Main points*
 
 
 ## 1. Examining Continuous Variables
@@ -445,10 +441,7 @@ area is drawn correspondingly darker (or more opaque).
 ```{r fig.width=10,fig.height=5}
 library('GGally'); data(food, package="MMST")
 names(food) <- c("Fat", "Food.energy", "Carbohyd", "Protein", "Cholest", "Wt", "Satur.Fat")
-# food1 <- food/food$Wt
-food1 <- head(food, 10)/head(food, 10)$Wt
-# TODO: sterge linia de deasupra si decomenteaza pe cealalta
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
+food1 <- food/food$Wt
 ggparcoord(data = food1, columns=c(1:5, 7), scale="uniminmax", alphaLines=0.2) + 
   xlab("") + ylab("")
 ```
@@ -490,28 +483,7 @@ ggparcoord(data = food1, columns=c(1:5, 7), scale="uniminmax", alphaLines=0.2) +
 ggparcoord(iris, columns=1:4, groupColumn="Species")
 ```
 
-## **3.4. Interpreting clustering results**
-
-#### We can compare the clusters graphically with a pcp in which the clusters are given different colours.
-
-#### In the **USArrests** dataset from 1973, the *Assault* variable separates the clusters, because it has a larger range of values than the other three variables.
-
-```{r fig.width=10,fig.height=5}
-hcav <- hclust(dist(USArrests), method="ave")
-clu3 <- cutree(hcav, k=3)
-clus <- factor(clu3)
-usa1 <- cbind(USArrests, clus)
-ggparcoord(usa1, columns=1:4, groupColumn="clus", scale="uniminmax") + 
-  xlab("") + ylab("") + 
-  theme(legend.position = "none") +
-  geom_line(size = 1.1)
-ggparcoord(usa1, columns=1:4, groupColumn="clus", scale="globalminmax") + 
-  xlab("") + ylab("") + 
-  theme(legend.position = "none") +
-  geom_line(size = 1.1)
-```
-
-## **3.5. Parallel coordinate plots and time series**
+## **3.4. Parallel coordinate plots and time series**
 
 #### In a parallel coordinate plot used for representing time series:
 - each axis represents one of the time points;
@@ -534,7 +506,7 @@ ggparcoord(subset(c2[1:48,], c2[1:48,147]> 250000), columns=2:147, groupColumn="
   theme(legend.position = "none")
 ```
 
-## **3.6. Parallel coordinate plots for indices**
+## **3.5. Parallel coordinate plots for indices**
 
 #### Usually, index values are weighted combinations of the values of their components. Examples:
 - **stock market indices** - used to represent performances of groups of shares;
@@ -568,24 +540,9 @@ ggparcoord(uniranks2[order(uniranks2$Rus, decreasing=FALSE),],
            geom_line(size = 0.8)
 ```
 
-## **3.7. Options for parallel coordinate plots**
+## **3.6. Options for parallel coordinate plots**
 
-#### **3.7.1. Alignment**
-
-##### Instead of aligning the variables by their minimum and maximum values, they can be aligned by their *mean* or *median* with a corresponding adjustment to the minimum and maximum limits. This permits comparing the variability across variables better.
-
-```{r fig.width=10,fig.height=5}
-mz <- as.data.frame(apply(c2[1:48,2:147], 2,
-                          function(x) x - mean(x,na.rm=TRUE)))
-StateV <- c2[1:48,1]
-mzA <- as.data.frame(cbind(StateV, mz))
-ggparcoord(mzA, columns=2:147, scale="globalminmax", groupColumn="StateV") +
-  xlab("Year") + ylab("Acres") +
-  scale_x_discrete(breaks=seq(1865, 2015, 10)) +
-  theme(legend.position = "none")
-```
-
-#### **3.7.2. Scaling**
+#### **3.6.1. Scaling**
 
 ##### Depending on the situation, there are different types of scaling:
 - standardise each variable by substracting the *mean* and divinding by the *standard deviation* (**scale**=*std*)
@@ -595,10 +552,7 @@ ggparcoord(mzA, columns=2:147, scale="globalminmax", groupColumn="StateV") +
 
 ```{r fig.width=10,fig.height=5}
 library('gridExtra'); data(body, package="gclus")
-# body1 <- body
-body1 = rbind(head(body, 10), tail(body, 10))
-# TODO: sterge linia de deasupra si decomenteaza pe cealalta
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
+body1 <- body
 names(body1) <- abbreviate(names(body), 2)
 names(body1)[c(4:5, 11:13, 19:21)] <- c("CDp", "CD", "Ch", "Ws", "Ab", "Cl", "An", "Wr")
 a1 <- ggparcoord(body1, columns=1:24, alphaLines=0.1) + xlab("") + ylab("")
@@ -608,7 +562,7 @@ a4 <- ggparcoord(body1, columns=1:24, scale="center", scaleSummary="median", alp
 grid.arrange(a1, a2, a3, a4)
 ```
 
-## **3.7.3. Outliers**
+## **3.6.2. Outliers**
 
 ##### Sometimes we want to redraw the plot without showing the outliers. There are 3 ways:
 - remove the cases with any outliers
@@ -624,9 +578,6 @@ fc <- function(xv) {
   cxv <- ifelse(cxv < bl, NA, cxv)
 }
 data(food, package="MMST")
-food <- head(food, 30)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 rxfood <- as.data.frame(apply(food,2,fc))
 ggparcoord(data = rxfood, columns = c(1:7), 
            scale="uniminmax", missing="exclude", 
@@ -642,9 +593,6 @@ fb <- function(xv) {
   rxv <- ifelse(rxv < bl, bl, rxv)
 }
 data(food, package="MMST")
-food <- head(food, 30)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 rfood <- as.data.frame(apply(food,2,fb))
 ggparcoord(data = rfood, columns = c(1:7), 
            scale="uniminmax", alphaLines=0.3)
@@ -658,74 +606,12 @@ fd <- function(xv) {
   dxv <- (xv - bl)/(bu - bl)
 }
 data(food, package="MMST")
-food <- head(food, 30)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 rofood <- as.data.frame(apply(food,2,fd))
 ggparcoord(data = rofood, columns = c(1:7)) + 
            coord_cartesian(ylim=c(0,1))
 ```
 
-## **3.7.4. Variable order**
-
-##### **Order the axes by the F statistics from analyses of variance based on a grouping variable (as illustrated in *body* dataset)**
-
-```{r fig.width=10,fig.height=5}
-# data(body, package="gclus")
-# body1 <- body
-body1$Gn <- factor(body1$Gn)
-ggparcoord(body1, columns=1:24, scale="uniminmax", 
-           alphaLines=0.4, groupColumn="Gn",
-           order="allClass") + xlab("") + ylab("") + 
-           theme(legend.position = "none",
-           axis.ticks.y = element_blank(),
-           axis.text.y = element_blank())
-```
-
-- we can display two graphics, one for women and one for men, to avoid overplotting for the variables where the genders overlap.
-
-```{r fig.width=10,fig.height=10}
-a <- ggparcoord(body1[order(body1$Gn),], columns=c(1:24),
-                groupColumn="Gn", order="allClass",
-                scale="uniminmax") + xlab("") + ylab("") +
-                theme(legend.position = "none",
-                axis.ticks.y = element_blank(),
-                axis.text.y = element_blank()) +
-                scale_colour_manual(values = c("grey","#00BFC4"))
-b <- ggparcoord(body1[order(body1$Gn, decreasing=TRUE),],
-                columns=c(1:24), groupColumn="Gn", order="allClass",
-                scale="uniminmax") + xlab("") + ylab("") +
-                theme(legend.position = "none",
-                axis.ticks.y = element_blank(),
-                axis.text.y = element_blank()) +
-                scale_colour_manual(values = c("#F8766D","grey"))
-grid.arrange(a,b)
-```
-
-##### **Order the axes by their median values (*body* dataset)**
-
-```{r fig.width=5,fig.height=5}
-library('dplyr')
-m2 <- apply(body[, 1:24], 2, median, na.rm=TRUE)
-m2a <- order(m2)
-ggparcoord(data = select(body, -Gender), alphaLines=0.3,
-           scale="globalminmax", order=m2a) + coord_flip()
-```
-
-
-##### **Order the axes by their maximum values after standardization by mean and standard deviation (*body* dataset)**
-
-```{r fig.width=10,fig.height=5}
-B1 <- ggparcoord(data = body1, columns=c(1:24), scale="std")
-B2 <- acast(B1$data[ ,c(2,4,5)], .ID ~ variable)
-m4 <- apply(B2, 2, max, na.rm=TRUE)
-m4r <- order(m4)
-ggparcoord(data = body1, alphaLines=0.3,
-           columns=c(1:24), scale="std", order=m4r)
-```
-
-
-## **3.7.5. Formatting**
+## **3.6.3. Formatting**
 
 ##### ***Type of display***
 - by default cases are represented as polygonal lines;
@@ -755,9 +641,6 @@ shading scale by a numeric variable;
 
 ```{r fig.width=10,fig.height=8}
 data(Boston, package="MASS")
-Boston <- head(Boston, 10)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 Boston1 <- within(Boston,
                   hmedv <- factor(ifelse(medv == 50,"Top", "Rest")))
 Boston1 <- within(Boston1, mlevel <- ifelse(medv==50,1,0.1))
@@ -784,6 +667,7 @@ The option **alphaLines** in *ggparcoord* can be used:
 - to apply a user-specified variable in which the level of alpha-blending can be set for each case individually.
 
 ```{r fig.width=10,fig.height=5}
+library('dplyr')
 Boston1 <- Boston1 %>% mutate(
            arad = factor(ifelse(rad < max(rad), 0, 1)),
            aLevel = ifelse(rad < max(rad), 0.1, 1))
@@ -796,7 +680,7 @@ ggparcoord(data = Boston1, columns=c(1:14),
            axis.text.y = element_blank())
 ```
 
-## **3.8. Main points**
+## **3.7. Main points**
 
 - Parallel coordinate plots are a **powerful multivariate display**, showing all continuous variables at once;
 

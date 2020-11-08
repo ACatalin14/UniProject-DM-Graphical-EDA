@@ -12,14 +12,10 @@ output:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(include = TRUE, echo = TRUE, warning= FALSE)
+knitr::opts_chunk$set(include = TRUE, echo = TRUE, warning = FALSE)
 ```
 
 ## **1. Examining Continuous Variables** 
-
-## **2. Looking for Structure: Dependency Relationships and Associations** 
-
-## **3. Investigating Multivariate Continuous Data**
 
 ### **1.1 Introduction**
 
@@ -66,6 +62,7 @@ hist(child, xlab=ht, main="Children", col="green")
 hist(parent, xlab=ht, main="Parents", col="blue")})
 
 ```
+
 #### First things first, we can see that:
 - the distributions are roughly symmetric and there is more spread amongst the children;
 - there appear to be no outliers;
@@ -168,6 +165,8 @@ some feature that will lead to rejection of the null hypothesis.
 - Natural binwidths based on context are usually a good choice for histograms.
 - Histograms are good for emphasising features of the raw data, while density estimates are better for suggesting underlying models for the data.
 - Boxplots are best for identifying outliers and for comparing distributions across subgroups.
+
+## **2. Looking for Structure: Dependency Relationships and Associations** 
 
 ### **2.1. Introduction**
 
@@ -462,6 +461,8 @@ Points which are outliers in scatterplots may be outliers on one of the two dime
 
 \
 
+## **3. Investigating Multivariate Continuous Data**
+
 ### **3.1. Introduction**
 
 #### Traditional methods used for displaying multivariate continous data:
@@ -476,13 +477,13 @@ Points which are outliers in scatterplots may be outliers on one of the two dime
 
 ### **3.2. What is a parallel coordinate plot (pcp)?**
 
+Down below we can observe a *parallel coordinate plot* of the six variables 
+in the **food** dataset divided by the variable *weight.grams*, the weight of a serving.
+
 ```{r fig.width=10,fig.height=5}
 library('GGally'); data(food, package="MMST")
 names(food) <- c("Fat", "Food.energy", "Carbohyd", "Protein", "Cholest", "Wt", "Satur.Fat")
-# food1 <- food/food$Wt
-food1 <- head(food, 10)/head(food, 10)$Wt
-# TODO: sterge linia de deasupra si decomenteaza pe cealalta
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
+food1 <- food/food$Wt
 ggparcoord(data = food1, columns=c(1:5, 7), scale="uniminmax", alphaLines=0.2) + 
   xlab("") + ylab("")
 ```
@@ -520,6 +521,14 @@ ggparcoord(data = food1, columns=c(1:5, 7), scale="uniminmax", alphaLines=0.2) +
 \
 
 #### **Illustrating Fisher’s iris dataset**
+
+In a pcp of the data in the figure down below we can see how clearly the *setosa*
+species is separated from the other two species on the petal measurements, how it is
+lower on three of the measurements, but higher on *Sepal.Width*, where there is
+also a *setosa* outlier, how the two petal measurements almost separate the other
+two species, and how additionally there are two unusual *virginica* values on
+*Sepal.Width*
+
 ```{r fig.width=10,fig.height=5}
 ggparcoord(iris, columns=1:4, groupColumn="Species")
 ```
@@ -528,7 +537,10 @@ ggparcoord(iris, columns=1:4, groupColumn="Species")
 
 #### We can compare the clusters graphically with a pcp in which the clusters are given different colours.
 
-#### In the **USArrests** dataset from 1973, the *Assault* variable separates the clusters, because it has a larger range of values than the other three variables.
+In the **USArrests** dataset from 1973, the *Assault* variable separates the clusters, 
+and the reason becomes obvious if we draw the same plot with the option *scale="globalminmax"*,
+which puts all the variables on a common scale: *Assault* has a much higher range of values
+than the other three variables, so it dominates the multivariate distance calculations.
 
 ```{r fig.width=10,fig.height=5}
 hcav <- hclust(dist(USArrests), method="ave")
@@ -557,6 +569,13 @@ ggparcoord(usa1, columns=1:4, groupColumn="clus", scale="globalminmax") +
 \
 
 #### **Illustrating the acres of corn planted by US states from 1866 to 2011**
+
+Down below we can observe a pcp of the acres of corn planted by US states from 1866 to 2011 
+from the **nass.corn** dataset in the **agridat** package. Only the states with more than 250,000 acres 
+planted in 2011 and no missing values are included.
+
+The sharp rise for five states in the 19th century, the dips at the time of the Depression in the 1930s and in the early 1980s, and various unusual individual patterns are all visible in this pcp.
+
 ```{r fig.width=10,fig.height=5}
 library(reshape2); data(nass.corn, package="agridat")
 c1 <- melt(nass.corn, id=c("year", "state"))
@@ -584,6 +603,12 @@ ggparcoord(subset(c2[1:48,], c2[1:48,147]> 250000), columns=2:147, groupColumn="
 \
 
 #### **Illustrating the Russell group from the *uniranks* dataset**
+
+Here we can see a pcp of the **uniranks** dataset from the **GDAdata** package. 120 universities 
+in the UK were ranked using a combination of eight criteria. The *AverageTeachingScore* is 
+the overall index and the criteria are the components. *The Russell* group is made up of 24 
+of the top UK universities. In this figure they have been coloured red to highlight them.
+
 ```{r fig.width=10,fig.height=5}
 data(uniranks, package="GDAdata")
 names(uniranks)[c(5, 6, 8, 10, 11, 13)] <- c("AvTeach", "NSSTeach", "SpendperSt", "Careers", "VAddScore", "NSSFeedb")
@@ -606,7 +631,7 @@ ggparcoord(uniranks2[order(uniranks2$Rus, decreasing=FALSE),],
 
 #### **3.7.1. Alignment**
 
-##### Instead of aligning the variables by their minimum and maximum values, they can be aligned by their *mean* or *median* with a corresponding adjustment to the minimum and maximum limits. This permits comparing the variability across variables better.
+##### Instead of aligning the variables by their minimum and maximum values, they can be aligned by their *mean* or *median* with a corresponding adjustment to the minimum and maximum limits. This permits comparing the variability across variables better. The *nass.corn* dataset from **3.5. Parallel coordinate plots and time series** has been used to illustrate this kind of alignment by mean.
 
 ```{r fig.width=10,fig.height=5}
 mz <- as.data.frame(apply(c2[1:48,2:147], 2,
@@ -627,12 +652,11 @@ ggparcoord(mzA, columns=2:147, scale="globalminmax", groupColumn="StateV") +
 - use a common scale so that the data will not be altered (**scale**=*globalminmax*)
 - standardize vertical height and then center each varialbe around the *median* (**scale**=*center*, **scaleSummary**=*median*)
 
+##### Here we have used the 24 measurements for the 507 men and women in the **body** dataset, each pcp having a different type of scaling.
+
 ```{r fig.width=10,fig.height=5}
 library('gridExtra'); data(body, package="gclus")
-# body1 <- body
-body1 = rbind(head(body, 10), tail(body, 10))
-# TODO: sterge linia de deasupra si decomenteaza pe cealalta
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
+body1 <- body
 names(body1) <- abbreviate(names(body), 2)
 names(body1)[c(4:5, 11:13, 19:21)] <- c("CDp", "CD", "Ch", "Ws", "Ab", "Cl", "An", "Wr")
 a1 <- ggparcoord(body1, columns=1:24, alphaLines=0.1) + xlab("") + ylab("")
@@ -658,9 +682,6 @@ fc <- function(xv) {
   cxv <- ifelse(cxv < bl, NA, cxv)
 }
 data(food, package="MMST")
-food <- head(food, 30)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 rxfood <- as.data.frame(apply(food,2,fc))
 ggparcoord(data = rxfood, columns = c(1:7), 
            scale="uniminmax", missing="exclude", 
@@ -676,9 +697,6 @@ fb <- function(xv) {
   rxv <- ifelse(rxv < bl, bl, rxv)
 }
 data(food, package="MMST")
-food <- head(food, 30)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 rfood <- as.data.frame(apply(food,2,fb))
 ggparcoord(data = rfood, columns = c(1:7), 
            scale="uniminmax", alphaLines=0.3)
@@ -692,9 +710,6 @@ fd <- function(xv) {
   dxv <- (xv - bl)/(bu - bl)
 }
 data(food, package="MMST")
-food <- head(food, 30)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 rofood <- as.data.frame(apply(food,2,fd))
 ggparcoord(data = rofood, columns = c(1:7)) + 
            coord_cartesian(ylim=c(0,1))
@@ -789,9 +804,6 @@ shading scale by a numeric variable;
 
 ```{r fig.width=10,fig.height=8}
 data(Boston, package="MASS")
-Boston <- head(Boston, 10)
-# TODO: sterge linia de deasupra
-# TODO: pt un plot mai plin si mai mult timp de asteptat la build
 Boston1 <- within(Boston,
                   hmedv <- factor(ifelse(medv == 50,"Top", "Rest")))
 Boston1 <- within(Boston1, mlevel <- ifelse(medv==50,1,0.1))
