@@ -13,6 +13,22 @@ knitr::opts_chunk$set(include = TRUE, echo = TRUE)
 
 **1. Examining Continuous Variables**
 
+*1.1. Introduction*
+
+*1.2. What features might continuous variable have? *
+
+*1.3. Looking for features*
+
+*1.4. Comparing distributions by subgroups*
+
+*1.5. What plots are there for individual continuous variables?*
+
+*1.6. Plot options*
+
+*1.7. Modelling and testing for continuous variables*
+
+*1.8. Main points of chapter*
+
 **2. Looking for Structure: Dependency Relationships and Associations**
 
 *2.1. Introduction*
@@ -53,6 +69,154 @@ knitr::opts_chunk$set(include = TRUE, echo = TRUE)
 
 
 ## 1. Examining Continuous Variables
+
+### **1.1. Introduction**
+#### A continuous variable in theory can take any value over its range. A handy exemple of countinuous variable can be:
+- age: you can’t count “age” because it would literally take "forever". you could be:
+25 years, 10 months, 2 days, 5 hours, 4 seconds, 4 milliseconds, 8 nanoseconds and so on..
+- time: it will also take "forever" to count the time; how many nanoseconds since we start reading this line? 
+- In practice data for continuous variables are generally rounded to some level of measurement accuracy.
+
+#### Different plotting methods are used to display the data distribution for continuous variables. 
+The purpose of those methods is to highlight important features of data. Some plots emphasise one feature over another, some are very specialised, some require more deciphering than others.
+
+####  Two possible approaches are to use a range of different plot types or to use a variety of different plots of the same type. 
+The plots types we are going to use in this chapter are histograms and boxplots.
+
+
+## **1.2. What features might continuous variable have?**
+
+#### Let's see a list of features for continuous variables:
+- **Assymetry**: the distribution is skewed to the left or right;
+- **Outliers**: one or more values that are far from the rest of the data.
+- **Multimodality**: the distribution has more than one peak;
+- **Gaps**: there are ranges of values within the data where no cases are recorded;
+- **Heaping**: some values occur unexpectedly often;
+- **Rounding**: only certain values are found because of the rounding process;
+- **Impossibilities**: values outside the feasible range; you can't be -1 year old;
+- **Errors**: values that look wrong for one reason or another
+
+#### Graphics are good for displaying the features**
+They can provide more and different kinds of information than a set of
+summary statistics.
+
+## **1.3. Looking for features**
+#### Next we are going to analyse a data set using histograms in order to see which features might be present and how we can find them.
+The *Galton's Height Data* is a famous 1885 study of Francis Galton exploring the relationship between the heights of adult children and the heights of their parents.
+
+The *galton* dataset from UsingR package includes data on heights for 928 children and 205 ‘midparents’. 
+Using the code below we are creating Children histogram and Parents histogram. 
+```{r fig.width=10,fig.height=3,fig.align='center'}
+data(galton, package="UsingR")
+ht <- "height (in)"
+par(mfrow=c(1,2), las=1, mar=c(3.1, 4.1, 1.1, 2.1))
+with(galton, {
+hist(child, xlab=ht, main="Children", col="green")
+hist(parent, xlab=ht, main="Parents", col="blue")})
+
+```
+#### First things first, we can see that:
+- the distributions are roughly symmetric and there is more spread amongst the children;
+- there appear to be no outliers;
+- although the histograms appear to have different binwidths they are actually the same;
+
+#### To look for gaps or heaping we create next histograms: 
+```{r fig.width=10,fig.height=4,fig.align='center'}
+par(mfrow=c(1,2), las=1, mar=c(3.1, 4.1, 1.1, 2.1))
+with(galton, {
+MASS::truehist(child, h=0.1)
+MASS::truehist(parent, h=0.1)})
+```
+In both histograms there appear to be narrower gaps between values at the boundaries. 
+Clearly the data were aggregated or reported to a limited level of precision because we can see how few height values actually occur.
+
+Next figure displays the histograms one above the other with equal scales and binwidths. The x-axis scale
+limits were chosen to include the full range of the data and the y-axis limits were
+chosen by inspection.
+```{r fig.width=8,fig.height=4,fig.align='center'}
+library(ggplot2)
+library(gridExtra)
+c1 <- ggplot(galton, aes(child)) + geom_bar( binwidth=1) +
+xlim(60, 75) + ylim(0, 225) + ylab("") +
+geom_vline(xintercept=median(galton$child),
+col="red")
+p1 <- ggplot(galton, aes(parent)) + geom_bar( binwidth=1) +
+xlim(60, 75) + ylim(0, 225) + ylab("") +
+geom_vline(xintercept=median(galton$parent),
+col="red")
+grid.arrange(c1, p1)
+```
+We can see that Parents’ heights are spread less and their median is
+slightly higher.
+Although the means are very similar, the parents’ distribution is clearly less variable. This is
+because each parent value is an average of two values.
+
+
+## **1.4. Comparing distributions by subgroups**
+#### A population can be made up of several groups. To get more informations, we can compare the distributions of variable across the groups.
+In order to approach this problem, we can use Boxplots because they make such an efficient use of the space available.
+
+#### Boxplots:
+The boxplot() function takes in any number of numeric vectors, drawing a boxplot for each vector.
+We will use airquality dataset in order to see the air quality for each month;
+In the example, Temp can be our numeric vector. Month can be our grouping variable, so that we get the boxplot for each month separately. In our dataset, month is in the form of number 5=May, 6=June and so on).
+
+```{r fig.width=8,fig.height=4,fig.align='center'}
+boxplot(Temp~Month,
+data=airquality,
+main="Different boxplots for each month",
+xlab="Month Number",
+ylab="Degree Fahrenheit",
+col="orange",
+border="brown"
+)
+```
+It is clear from the above figure that the July month (7) is relatively hotter than the rest.
+Although the boxplots convey a lot of information in a limited space, they have two disadvantages:
+If a distribution is not unimodal, you can’t see that, and it is difficult to
+convey information on how big the different groups are.
+
+## **1.5. What plots are there for individual continuous variables?**
+#### To display continuous data graphically we can use: 
+- **histogram** is used for grouping data into intervals, and drawing a bar for each interval, shows
+the empirical distribution,
+- **boxplot** for displaying individual outliers and robust statistics for the data, useful for
+identifying outliers and for comparisons of distributions across subgroups,
+- **dotplot** plotting each point individually as a dot, good for spotting gaps in the data,
+- **rugplot** plotting each point individually as a line, often used as an additional plot
+along the horizontal axis of another display,
+- **density** estimate plotting an estimated density of the variable’s distribution, so
+more like a model than a data display, 
+- **distribution** estimate showing the estimated distribution function, useful for comparing distributions, if one is always ‘ahead’ of another, 
+- **Q-Q plot** comparing the distribution to a theoretical one, normal distribution.
+
+## **1.6. Plot options**
+#### What are the options for plottings? 
+- **Binwidths**: The width of the bins. Can be specified as a numeric value or as a function that calculates width from unscaled x. Exploring multiple widths, we can find the best to ilustrate the stories in our data. This option is crucial for plotting histograms.
+- **Unequal binwidths**: While the idea of using unequal binwidths is attractive, it is awkward
+to apply in practice because the it displays confusing and hard to interpret data. If you still want
+to do it, consider a variable transformation instead.
+- **Banwidth for density estimates**: The bandwidth selector is a function of four arguments: The data x, a kernel string kernel, a start string start, and a support vector support. To obtain the functions associated with these strings, use get_kernel and get_start. The function should return a double. Crucial while displaying density estimates.
+
+## **1.7. Modelling and testing for continuous variables**
+#### Let's see the way of modelling and testing for continuous variable: 
+- **Means** is the most common test for continuous data is to test the mean in some way, either
+against a standard value, or in comparison to the means of other variables, or by
+subsets. Mostly a t-test is used. Alternatively medians may be tested,
+especially in conjunction with using boxplots.
+- **Symmetry**. Its role is to improve the power of the test, using bootstrapping. 
+- **Normality** tests like Anderson-Darling, Shapiro-Wilk, Kolmogorov-Smirnov have low power for small samples and may be rather too powerful for really large samples. A large sample will tend to have
+some feature that will lead to rejection of the null hypothesis.
+- **Density estimation** in R can be applied using one of the many R packages wich offer some for of density estimation. This model is fitting the density estimates without testing. Remember that densities for variables with strict boundaries need special treatment at the boundaries.
+- **Outliers** How useful a outlier test might be depends on the particular application. Testing for outliers we need to prevent both masking: *one group of outliers prevents you recognising another* and swamping: *mistaking standard observations for outliers*.
+- **Multimodality** test can be approach by the dip test. It was proposed in *Hartigan and Hartigan, 1985* and it is available in R in the appropriately named package *diptest*.
+
+## **1.8. Main points of chapter** 
+- There are lots of different features that can arise in the frequency distributions of single continuous variables.
+- There is no optimal type of plot and no optimal version of a plot type. Look at several different plots and several different versions of each.
+- Natural binwidths based on context are usually a good choice for histograms.
+- Histograms are good for emphasising features of the raw data, while density estimates are better for suggesting underlying models for the data.
+- Boxplots are best for identifying outliers and for comparing distributions across subgroups.
 
 ## 2. Looking for Structure: Dependency Relationships and Associations
 
