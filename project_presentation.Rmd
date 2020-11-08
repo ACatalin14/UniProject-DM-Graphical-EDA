@@ -6,7 +6,7 @@ output: slidy_presentation
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(include = TRUE, echo = TRUE)
+knitr::opts_chunk$set(include = TRUE, echo = TRUE, warning=FALSE)
 ```
 
 ## Structure
@@ -46,6 +46,8 @@ knitr::opts_chunk$set(include = TRUE, echo = TRUE)
 *2.7. Scatterplot options*
 
 *2.8. Modelling and testing for relationships between variables*
+
+*2.9. Main points*
 
 
 **3. Investigating Multivariate Continuous Data**
@@ -238,6 +240,8 @@ ggtitle("Athletes at the London Olympics 2012")
 ```
 
 ## **2.2. Features you can see with scatterplots**
+\
+\
 
 ### Features that might be found in a scatterplot include:
 - casual relationships (linear and nonlinear)
@@ -250,6 +254,25 @@ ggtitle("Athletes at the London Olympics 2012")
 
 ## **2.3. Looking at pairs of continuous variables**
 
+### **Drinks Wages**
+
+A scatterplot of average wages against proportion of drinkers for all 70 trades in Pearson’s *DrinksWages* dataset in the **HistData** package shows that there are a surprising number of trades where either all workers are drinkers or none are. 
+
+```{r fig.width=7,fig.height=3.5,fig.align='center'}
+data(DrinksWages, package = "HistData")
+ggplot(DrinksWages, aes(drinks / n, wage)) + geom_point() +
+  xlab("Proportion of drinkers") + xlim(0, 1) + ylim(0, 40)
+
+```
+
+**Observations**
+
+- over a third have only 1 or 2 members in the survey, which affects the graphic;
+
+- after excluding the smaller trades, with less than five members, there is still no particular pattern.
+
+## **2.3. Looking at pairs of continuous variables (cont.) **
+
 ### **Old faithful geyser**
 
 The dataset geyser in MASS provides 299 observations of the duration of eruptions and the time to the next eruption for the Old Faithful geyser in Yellowstone Park.
@@ -259,7 +282,7 @@ library(ggplot2);
 data(geyser, package="MASS");
 ggplot(geyser, aes(duration, waiting)) + geom_point();
 ```
-A short duration implies a long waiting time until the next eruption, while a long duration can imply a short or long waiting time. There may be 3 clusters and possibly a couple of outlying values, but there is also a suggestion of rounded values for the eruption durations (note the numbers of durations of 2 and 4 minutes). To assess the possibility of clustering, consider a density estimate. The figure below displays contours of a bivariate density estimate supporting the idea of there being three clusters.
+To assess the possibility of clustering, consider a density estimate. The figure below displays contours of a bivariate density estimate supporting the idea of there being three clusters.
 
 ```{r fig.width=7,fig.height=3.5,fig.align='center'}
 ggplot(geyser, aes(duration, waiting)) + geom_point() +
@@ -272,7 +295,7 @@ geom_density2d()
 
 Adding lines or smooths to scatterplots is easy and often provides valuable guidance, as can be seen comparing the figures below, where the relationship between sons’ and fathers’ heights, from dataset *father.son*, is difficult to assess from the scatterplot alone.
 
-The best fit regression line has a slope of just over 0.5, as can be seen by comparison with the line y = x. The height of a man is influenced by the height of his father, but there is a lot of unexplained variability. 
+**Scatterplot with best regression line and y=x diagonal**
 
 ```{r fig.width=5,fig.height=5, fig.align='center'}
 data(father.son, package="UsingR")
@@ -281,7 +304,7 @@ geom_smooth(method="lm", colour="red") +
 geom_abline(slope=1, intercept=0)
 ```
 
-To explore further whether a non-linear model might be warranted, we can fit a smoother or plot a smoother and the best fit regression line together.
+**Plotting a smoother and the best regression line together**
 
 ```{r fig.width=5,fig.height=5, fig.align='center'}
 data(father.son, package="UsingR")
@@ -293,6 +316,25 @@ stat_smooth()
 
 ## **2.5. Comparing groups within scatterplots**
 
+The Olympic athletes’ dataset shown in Chapter 2.1 suffered from overplotting, which can be overcome by splitting up the data by possible explanatory variables. In this case, we can separate the plot by sex: a scatterplot for females and one for males.
+
+
+```{r fig.width=10,fig.height=5,fig.align='center'}
+ggplot(oly12, aes(Height, Weight)) +
+geom_point(size = 1) + facet_wrap(~Sex, ncol=1)
+
+```
+
+Plotting all the 42 sports from the dataset together we get the following figure:
+
+```{r fig.width=8,fig.height=10,fig.align='center'}
+oly12S <- within(oly12, Sport <- abbreviate(Sport, 12))
+ggplot(oly12S, aes(Height, Weight)) +
+  geom_point(size = 1) + facet_wrap( ~ Sport) +
+  ggtitle("Weight and Height by Sport")
+
+```
+
 ## **2.6. Scatterplot matrices for looking at many pairs of variables**
 
 Scatterplot matrices (*sploms*) are tables of scatterplots with each variable plotted against all of the others. They give excellent initial overviews of the relationships between continuous variables in datasets with small numbers of variables.
@@ -300,8 +342,6 @@ Scatterplot matrices (*sploms*) are tables of scatterplots with each variable pl
 ### **Crime in the U.S.**
 
 The dataset *crime.us* from the **VGAMdata** package includes the absolute crime figures and the crime rates by population for the fifty U.S. states in 2009.
-
-The figure below shows a splom of the rates for seven kinds of crime. The dataset also includes rates for the four crimes of violence together and density estimates for the variables down the diagonal.
 
 ```{r fig.width=10,fig.height=5, fig.align='center'}
 library(GGally);
@@ -314,6 +354,8 @@ title="Crime rates in the USA",
 diag=list(continuous='densityDiag'), axisLabels='none')
 
 ```
+
+The figure above shows a splom of the rates for seven kinds of crime. The dataset also includes rates for the four crimes of violence together and density estimates for the variables down the diagonal.
 
 \
 
@@ -333,36 +375,58 @@ diag=list(continuous='densityDiag'), axisLabels='none')
 | *...*          | ...         |
  
 
-**Note:** Sploms are ineffective for large number of variables (a splom for m variables includes m(m-1) scatterplots and m diagonal elements). However, they can be useful for giving a quick overview of a few variables.
+**Note:** Sploms are ineffective for large number of variables (a splom for m variables includes m(m-1) scatterplots and m diagonal elements).
 
 ## **2.7. Scatterplot options**
-### **2.7.1 Point size ** 
+### **Point size** 
 - larger (for emphasising outliers);
 - smaller (for distinguishing groups of points);
-- to represent the value of a continous non-negative variable.
 
-### **2.7.2 Symbols for points **
+### **Symbols for points**
 - if the points do not overlap and are easy to identify, we should draw the members of each group with a different symbol to tell them apart;
 - with large datasets, we should use a set of scatterplots for each group.
 
-### **2.7.3 Alpha-blending **
-Each point is given a weight between 0 and 1 and where several points overlap, the resulting
+### **Alpha-blending**
+- each point is given a weight between 0 and 1;
+- where several points overlap, the resulting
 area is drawn correspondingly darker (or more opaque).
 
-### **2.7.4 Colouring points **
+### **Colouring points**
 - used to distinguish points by groups;
 - if there are points on top of one another, the visible colour is the colour of the last point drawn.
 
 
 ## **2.8. Modelling and testing for relationships between variables**
+\
+\
 
-### **Correlation**
-Correlation coefficients measure linear association, but to learn more about what they might mean we should also draw a scatterplot. Likewise, if we draw a scatterplot and we see a linear association, we should calculate the previously mentioned coefficient to measure exactly the level of correlation.
+### *Correlation*
 
-### **Regression**
-Given a presumed causal relationship between the y-variable and the x-variable of a scatterplot, regression may be used to fit a model. It can be helpful to overlay the model on a scatterplot of the data, to add confidence bands for the fit, or to add predictive intervals for possible new points.
+\
 
-### **Smoothing**
+### *Regression*
+\
+
+### *Smoothing*
+\
+
+### *Bivariate density estimation*
+\
+
+### *Outliers*
+
+
+## **2.9. Main points**
+
+\
+\
+\
+
+- Scatterplots can take many different forms and provide a lot of information about the relationship between two variables.
+- Adding lines or smooths to scatterplots is easy and often provides valuable guidance, as can be seen in the plot from 2.4, where the relationship between sons’ and fathers’ heights is difficult to assess from the scatterplot alone.
+- Trellis displays are very effective for comparing scatterplots by subgroup, especially when the groups overlap, like in the case of the Olympic games scatterplot.
+- Sploms are excellent for giving a quick overview of a few variables. For example, the plot from 5.6 summarises the U.S. crime rates dataset well.
+
 
 ## 3. Investigating Multivariate Continuous Data
 
