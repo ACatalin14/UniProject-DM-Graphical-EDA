@@ -16,4 +16,11 @@ install.packages('gridExtra')
 install.packages('dplyr')
 install.packages('VGAMdata)
 install.packages('UsingR')
+install.packages('meta')
+install.packages('lawstat')
+install.packages('hdrcde')
+install.packages('Sleuth2')
+install.packages('MASS')
+install.packages('DAAG')
+
 ```
