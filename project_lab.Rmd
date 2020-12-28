@@ -1,0 +1,224 @@
+---
+title: "Graphical EDA I: continous data"
+author: Team 1
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include = TRUE,echo = TRUE, warning=FALSE)
+```
+
+
+
+## Structure
+
+**1. Examining Continuous Variables**
+
+**2. Looking for Structure: Dependency Relationships and Associations**
+
+**3. Investigating Multivariate Continuous Data**
+
+## 1. Examining Continuous Variables
+
+
+## 2. Looking for Structure: Dependency Relationships and Associations
+
+### Exercise 1. Movie ratings
+
+Figure 5.7
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(ggplot2)
+library(dplyr)
+data(movies, package = "ggplot2movies")
+ ggplot(movies, aes(votes, rating)) + geom_point() + ylim(1, 10)
+```
+
+(a) Excluding all films with fewer than 100 votes:
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(ggplot2)
+library(dplyr)
+
+data(movies, package = "ggplot2movies")
+
+filtered <- filter(movies, votes > 100)
+ggplot(filtered, aes(votes, rating)) + geom_point() + ylim(1, 10) 
+  
+```
+
+(b) Excluding films with average rating greater than 9 and also the ones that have more than 100000 votes:
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(ggplot2)
+library(dplyr)
+
+data(movies, package = "ggplot2movies")
+filtered2 <- filter(movies, rating < 9 | votes>100000 )
+
+ggplot(filtered2, aes(votes, rating)) + geom_point() + ylim(1, 10) 
+
+```
+
+
+### Exercise 2. Meta analysis (**Olkin95** dataset)
+
+(a) Number of observations in each experimental group (n.e) against the corresponding number of observations in each control group (n.c):
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(meta)
+data(Olkin1995)
+
+ggplot(Olkin1995, aes(n.exp, n.cont)) + geom_point()
+# summary(metabin(ev.exp, n.exp, ev.cont, n.cont, data = Olkin1995))
+#print(Olkin1995)
+
+```
+
+(b) Restricting the scatterplot to only those with less than 100 patients in each group:
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(meta)
+data(Olkin1995)
+ggplot(Olkin1995, aes(n.exp, n.cont)) + geom_point() + ylim(1, 100) + xlim(1,100)
+```
+We can observe easier now some outliers in the scatterplot, which were not visible before.
+
+### Exercise 3. Zuni
+
+(a) Scatterplot of average revenue per pupil (Revenue) against the corresponding number of pupils (Mem):
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(lawstat)
+data(zuni)
+#print(zuni)
+ggplot(zuni, aes(Revenue,Mem)) + geom_point()
+
+```
+Observations: 
+
+
+(b) Plotting against **log** of the number of pupils:
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(lawstat)
+data(zuni)
+ggplot(zuni, aes(Revenue,log(Mem))) + geom_point()
+```
+Logging also revenue per pupil adds no other insight to the scatterplot, as shown below:
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(lawstat)
+data(zuni)
+ggplot(zuni, aes(log(Revenue),log(Mem))) + geom_point()
+```
+
+### Exercise 4. Pearson heights
+
+(a) Scatterplot of the heights:
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+data(father.son, package="UsingR")
+ggplot(father.son, aes(fheight, sheight)) + geom_point()
+```
+
+(b) Including both points and highest density regions:
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(hdrcde)
+data(father.son, package="UsingR")
+
+par(mar=c(3.1, 4.1, 1.1, 2.1))
+with(father.son,hdr.boxplot.2d(fheight, sheight, show.points=TRUE, prob=c(0.01,0.05,0.5,0.75)))
+
+```
+*Note:* **mar**= A numeric vector of length 4, which sets the margin sizes in the following order: bottom, left, top, and right. The default is c(5.1, 4.1, 4.1, 2.1).
+
+(c) Fitting a linear model to the data and a loess smooth:
+```{r fig.width=5,fig.height=5,fig.align='center'}
+data(father.son, package="UsingR")
+
+ggplot(father.son, aes(fheight, sheight)) + geom_point() + geom_smooth(method="lm", colour="red") + geom_abline(slope=1, intercept=0)
+
+```
+
+A nonlinear model is not necessary, as the two curves are almost identical:
+```{r fig.width=5,fig.height=5,fig.align='center'}
+data(father.son, package="UsingR")
+ggplot(father.son, aes(fheight, sheight)) + geom_point() +
+geom_smooth(method="lm", colour="red", se=FALSE) +
+stat_smooth()
+```
+
+### Exercise 5. Bank discrimination
+
+A subset of Roberts’ bank sex discrimination dataset from 1979 is available in the package **Sleuth2** under the name *case1202*.
+
+(a) Scatterplot matrix of the three variables: *Senior*, *Age* and *Exper*:
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(GGally)
+data(case1202, package="Sleuth2")
+#summary(case1202)
+par(mar=c(1.1, 1.1, 1.1, 1.1))
+#spm(select(case1202, c(4:5,7)), diagonal="histogram", smoother=FALSE, reg.line=FALSE) #groups=bank$Status)
+ggpairs(case1202[,c(4:5, 7)], title="Bank discrimination", diag=list(continuous='density'), axisLabels='none')
+
+```
+
+
+(b) Scatterplots involving seniority do not have the structure of the scatterplot of experience against age because:
+
+
+### Exercise 6. Cars
+
+Figure 5.8.
+```{r fig.width=5,fig.height=5,fig.align='center'}
+data(Cars93, package="MASS")
+#print(Cars93)
+ggplot(Cars93, aes(Weight, MPG.city)) + geom_point() +
+geom_smooth(colour="green") + ylim(0,50)
+```
+Note :fuel economy decreases with weight quite quickly initially and then more slowly.
+
+(a) Plotting 1/MPG.City (litres per 100 km instead of miles per gallon) against Horsepower:
+```{r fig.width=5,fig.height=5,fig.align='center'}
+data(Cars93, package="MASS")
+
+ggplot(Cars93, aes((1/MPG.city), Horsepower)) + geom_point() + geom_smooth(colour="green") 
+```
+Note: The lighter the car and the more horsepower it has, the better the gas mileage.
+The outliers represent:
+- Cars that are of type: Midsize, Sporty or Large (with horsepower above 200); mpg/city: 16-18-19-22
+- Cars that are of type: small, compact, mpg.city: 19-20-25 
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+data(Cars93, package="MASS")
+# filtered <- filter(Cars93, Horsepower <200 & MPG.city >20)
+filtered <- filter(Cars93, Horsepower > 100)
+#print(filtered)
+```
+
+### Exercise 7. Leaves
+
+The *leafshape* dataset in the **DAAG** package includes three measurements on each leaf (length, width, petiole) and the logarithms of the three measurements.
+
+(a) Sploms for the two sets of three variables
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(GGally)
+library(ggplot2)
+data(leafshape, package="DAAG")
+#summary(leafshape)
+par(mar=c(1.1, 1.1, 1.1, 1.1))
+
+ggpairs(leafshape[,c(1:3)], title="Standard Leaf measurements", diag=list(continuous='density'), axisLabels='none')
+
+#leafshape$arch <- unlist(leafshape$arch)
+
+ggpairs(leafshape[,c(7:5)], title="Logaritmic Leaf measurements", diag=list(continuous='density'), axisLabels='none')
+#, mapping = ggplot2::aes(colour=leafshape[8]), lower = list(continuous = wrap("smooth", alpha = 0.3, size=0.1)))
+
+```
+(b)
+
+
+
+## 3. Investigating Multivariate Continuous Data
+
