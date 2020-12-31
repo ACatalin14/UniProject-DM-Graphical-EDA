@@ -22,5 +22,7 @@ install.packages('hdrcde')
 install.packages('Sleuth2')
 install.packages('MASS')
 install.packages('DAAG')
-
+install.packages('HSAUR2')
+install.packages('pdfCluster')
+install.packages('SMPracticals')
 ```
