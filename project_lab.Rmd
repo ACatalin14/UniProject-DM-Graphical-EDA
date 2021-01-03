@@ -47,6 +47,7 @@ qplot(galaxies$Velocity) +
 The density plot of the model shows three distinct superclusters with the far right tail not being as distinct.
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
+library(mclust)
 mod <- mod <- Mclust(galaxies$Velocity)
 par(fig=c(0,1,0,1),new=T)
 plot(mod,what="density")
@@ -132,24 +133,76 @@ b) In order to classify a movie as short or as long, I think that using denisity
 
 ### Solution
 
+#### a) Histogram or boxplot?
+table
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(lawstat)
+data(zuni, package="lawstat")
+par(fig=c(0,1,0,1),new=T)
+hist(zuni$Revenue,
+     xlab = 'Revenue',
+     main = 'Revenue Histogram',
+     ylab = 'Nr.')
+```
+I prefer a histogram for showing 5% the lowest and the highets.
+
+#### b) Density estimation:
+```{r fig.width=5,fig.height=5,fig.align='center'}
+mod <- mod <- Mclust(zuni$Revenue)
+par(fig=c(0,1,0,1),new=T)
+plot(mod,what="density")
+```
+
 ### Exercise 6. Non-detectable
 
 ![](./exercises/exercise_1_6.jpg)
 
 ### Solution
-
+There is no "h39b.W1" attribute on CHAIN variable because it has been renamed in "log_virus". For both cases I would use a histogram because I can easily see the number for each case.
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(mi)
+library(ggplot2)
+data(CHAIN)
+par(fig=c(0,1,0,1),new=T)
+hist(CHAIN$log_virus,
+     xlab = 'Case',
+     main = 'Histogram of virus cases with 0s',
+     ylab = 'Nr.')
+```
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(mi)
+library(ggplot2)
+data(CHAIN)
+par(fig=c(0,1,0,1),new=T)
+hist(CHAIN$log_virus[CHAIN$log_virus != 0],
+     xlab = 'Case',
+     main = 'Histogram of virus cases without 0s',
+     ylab = 'Nr.')
+```
 ### Exercise 7. Diamonds
 
 ![](./exercises/exercise_1_7.jpg)
 
 ### Solution
+#### a) Diamond Weight
+A diamond's weight can be found in "carat" attribute. Let's see how can we see 
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(ggplot2)
+data(diamonds)
+ggplot(diamonds, aes(x=carat, y=price)) + geom_point()
+```
+I wanted to put in balance the weight of a diamond with it's price. Aparently the most expensive diamonds's weight is between 1,5 and 3 grams. Some of the most cheapest diamonds have weight the least. 
 
-### Exercise 8. Intermission
-
-![](./exercises/exercise_1_8.jpg)
-
-### Solution
-
+#### b) Distribution of prices
+```{r fig.width=5,fig.height=5,fig.align='center'}
+data(diamonds, package="ggplot2")
+par(fig=c(0,1,0,1),new=T)
+hist(diamonds$price,
+     xlab = 'Price',
+     main = 'Histogram of Diamonds Prices',
+     ylab = 'Frequency')
+```
+For the distribution of Diamond Prices, I chose a histogram. I think it is very easy to understand looking at this histogram that the most expensive diamonds are the fewest. I think a factor that the most expensive diamonds are the fewest is that those diamonds are very rare and very hard to find. Another factor is that it requires more work than the others. 
 
 ## 2. Looking for Structure: Dependency Relationships and Associations
 
