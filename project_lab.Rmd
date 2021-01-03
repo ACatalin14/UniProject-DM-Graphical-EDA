@@ -210,6 +210,8 @@ For the distribution of Diamond Prices, I chose a histogram. I think it is very 
 
 ### Exercise 1. Movie ratings
 
+![](./exercises/exercise_2_1.PNG)
+
 Figure 5.7
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
@@ -217,9 +219,10 @@ library(ggplot2)
 library(dplyr)
 data(movies, package = "ggplot2movies")
  ggplot(movies, aes(votes, rating)) + geom_point() + ylim(1, 10)
+ 
 ```
 
-(a) Excluding all films with fewer than 100 votes:
+(a\) Excluding all films with fewer than 100 votes:
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(ggplot2)
 library(dplyr)
@@ -231,13 +234,15 @@ ggplot(filtered, aes(votes, rating)) + geom_point() + ylim(1, 10)
   
 ```
 
-(b) Excluding films with average rating greater than 9 and also the ones that have more than 100000 votes:
+(b\) Excluding films with average rating greater than 9 and also the ones that have more than 100000 votes:
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(ggplot2)
 library(dplyr)
 
 data(movies, package = "ggplot2movies")
-filtered2 <- filter(movies, rating < 9 | votes>100000 )
+#summary(movies)
+filtered2 <- filter(movies, rating < 9) #| votes>100000 )
+
 
 ggplot(filtered2, aes(votes, rating)) + geom_point() + ylim(1, 10) 
 
@@ -246,7 +251,9 @@ ggplot(filtered2, aes(votes, rating)) + geom_point() + ylim(1, 10)
 
 ### Exercise 2. Meta analysis (**Olkin95** dataset)
 
-(a) Number of observations in each experimental group (n.e) against the corresponding number of observations in each control group (n.c):
+![](./exercises/exercise_2_2.PNG)
+
+(a\) Number of observations in each experimental group (n.e) against the corresponding number of observations in each control group (n.c):
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(meta)
 data(Olkin1995)
@@ -257,17 +264,26 @@ ggplot(Olkin1995, aes(n.exp, n.cont)) + geom_point()
 
 ```
 
-(b) Restricting the scatterplot to only those with less than 100 patients in each group:
+Observations:
+- there is a linear relationship between the variables;
+- there are 4 outliers for higher values of the both variables (2500, 6000, 8500);
+- there are several gaps in the dataset, between the outliers previously mentioned;
+- there seems to be some overplotting at the lower values.
+
+(b\) Restricting the scatterplot to only those with less than 100 patients in each group:
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(meta)
 data(Olkin1995)
 ggplot(Olkin1995, aes(n.exp, n.cont)) + geom_point() + ylim(1, 100) + xlim(1,100)
 ```
-We can observe easier now some outliers in the scatterplot, which were not visible before.
+- As there was some overplotting in this range, "zooming" on that interval helps us gain more insight concerning 3-4 outliers, which were not visible before.
+
 
 ### Exercise 3. Zuni
 
-(a) Scatterplot of average revenue per pupil (Revenue) against the corresponding number of pupils (Mem):
+![](./exercises/exercise_2_3.PNG)
+
+(a\) Scatterplot of average revenue per pupil (Revenue) against the corresponding number of pupils (Mem):
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(lawstat)
 data(zuni)
@@ -276,15 +292,21 @@ ggplot(zuni, aes(Revenue,Mem)) + geom_point()
 
 ```
 Observations: 
+- there are two outliers for higher values for the Mem variable;
+-there are 4 outliers for values close to 0 for the *Mem* variable and bigger values for the *Revenue*;
+- there is a certain interval in which the values are situated and it may be a case of overplotting, as there are 420 rows in the dataset and only a few points on the scatterplot.
 
 
-(b) Plotting against **log** of the number of pupils:
+(b\) Plotting against **log** of the number of pupils preserves the order of the observations while making outliers less extreme. So the log transform enhances the visualization.
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(lawstat)
 data(zuni)
 ggplot(zuni, aes(Revenue,log(Mem))) + geom_point()
 ```
+
+
+
 Logging also revenue per pupil adds no other insight to the scatterplot, as shown below:
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
@@ -293,16 +315,24 @@ data(zuni)
 ggplot(zuni, aes(log(Revenue),log(Mem))) + geom_point()
 ```
 
+
+
+
+
 ### Exercise 4. Pearson heights
 
-(a) Scatterplot of the heights:
+![](./exercises/exercise_2_4.PNG)
+
+(a\) Scatterplot of the heights:
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 data(father.son, package="UsingR")
 ggplot(father.son, aes(fheight, sheight)) + geom_point()
 ```
 
-(b) Including both points and highest density regions:
+There are some outliers, for both higher and lower values of the variables, but it is hard to determine which ones.
+
+(b\) Including both points and highest density regions:
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(hdrcde)
@@ -312,9 +342,12 @@ par(mar=c(3.1, 4.1, 1.1, 2.1))
 with(father.son,hdr.boxplot.2d(fheight, sheight, show.points=TRUE, prob=c(0.01,0.05,0.5,0.75)))
 
 ```
+After using a density estimate, it's easier to see determine some outliers, outside the contours: 3 for lower values and 2-3 for higher values, all bivariate.
+
+
 *Note:* **mar**= A numeric vector of length 4, which sets the margin sizes in the following order: bottom, left, top, and right. The default is c(5.1, 4.1, 4.1, 2.1).
 
-(c) Fitting a linear model to the data and a loess smooth:
+(c\) Fitting a linear model to the data and a loess smooth:
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 data(father.son, package="UsingR")
 
@@ -330,11 +363,15 @@ geom_smooth(method="lm", colour="red", se=FALSE) +
 stat_smooth()
 ```
 
+
+
 ### Exercise 5. Bank discrimination
+
+![](./exercises/exercise_2_5.PNG)
 
 A subset of Roberts’ bank sex discrimination dataset from 1979 is available in the package **Sleuth2** under the name *case1202*.
 
-(a) Scatterplot matrix of the three variables: *Senior*, *Age* and *Exper*:
+(a\) Scatterplot matrix of the three variables: *Senior*, *Age* and *Exper*:
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(GGally)
@@ -347,10 +384,12 @@ ggpairs(case1202[,c(4:5, 7)], title="Bank discrimination", diag=list(continuous=
 ```
 
 
-(b) Scatterplots involving seniority do not have the structure of the scatterplot of experience against age because:
+(b\) Scatterplots involving seniority do not have the structure of the scatterplot of experience against age because:
 
 
 ### Exercise 6. Cars
+
+![](./exercises/exercise_2_6.PNG)
 
 Figure 5.8.
 ```{r fig.width=5,fig.height=5,fig.align='center'}
@@ -359,18 +398,18 @@ data(Cars93, package="MASS")
 ggplot(Cars93, aes(Weight, MPG.city)) + geom_point() +
 geom_smooth(colour="green") + ylim(0,50)
 ```
-Note :fuel economy decreases with weight quite quickly initially and then more slowly.
+*Note*: fuel economy decreases with weight quite quickly initially and then more slowly.
 
-(a) Plotting 1/MPG.City (litres per 100 km instead of miles per gallon) against Horsepower:
+Plotting 1/MPG.City (litres per 100 km instead of miles per gallon) against Horsepower:
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 data(Cars93, package="MASS")
 
 ggplot(Cars93, aes((1/MPG.city), Horsepower)) + geom_point() + geom_smooth(colour="green") 
 ```
-Note: The lighter the car and the more horsepower it has, the better the gas mileage.
-The outliers represent:
-- Cars that are of type: Midsize, Sporty or Large (with horsepower above 200); mpg/city: 16-18-19-22
-- Cars that are of type: small, compact, mpg.city: 19-20-25 
+
+- Plotting the two variables against each other we get a linear relationship, because the more horsepower it has, the better the gas mileage is. But after a certain value (at about 0.06 litres per 100 km), the cars with less horsepower need more fuel to gain speed.
+
+- The outliers represent the cars that have a lot more horsepower than the others.
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 data(Cars93, package="MASS")
@@ -379,17 +418,24 @@ filtered <- filter(Cars93, Horsepower > 100)
 #print(filtered)
 ```
 
+
+
+
+
 ### Exercise 7. Leaves
 
-The *leafshape* dataset in the **DAAG** package includes three measurements on each leaf (length, width, petiole) and the logarithms of the three measurements.
+![](./exercises/exercise_2_7.PNG)
 
-(a) Sploms for the two sets of three variables
+The *leafshape* dataset in the **DAAG** package includes three measurements on each leaf (length, width, petiole) and the logarithms of the three measurements.
+  
+(a\) Sploms for the two sets of three variables
 
 ```{r fig.width=5,fig.height=5,fig.align='center'}
 library(GGally)
 library(ggplot2)
 data(leafshape, package="DAAG")
 #summary(leafshape)
+print(leafshape)
 par(mar=c(1.1, 1.1, 1.1, 1.1))
 
 ggpairs(leafshape[,c(1:3)], title="Standard Leaf measurements", diag=list(continuous='density'), axisLabels='none')
@@ -400,7 +446,91 @@ ggpairs(leafshape[,c(7:5)], title="Logaritmic Leaf measurements", diag=list(cont
 #, mapping = ggplot2::aes(colour=leafshape[8]), lower = list(continuous = wrap("smooth", alpha = 0.3, size=0.1)))
 
 ```
-(b)
+
+- In the first set of variables there are many points with the same value for the leaf length (*bladelen*) and width (*bladewid*). That's why there is so much overplotting in the first scatterplot.
+
+- For the second set of variables, the log transformation preserves the order of the observations while making outliers less extreme. So the log transform will enhance the visualization.
+
+- I consider the second one more useful as it shows more insight and provides a way to avoid plotting points that represent more than one case.
+
+(b\) Coloring the cases by the variable *arch*, describing the leaf architecture:
+
+```{r fig.width=10,fig.height=10,fig.align='center'}
+library(car)
+data(leafshape, package="DAAG")
+#data(bank, package = "gclus")
+par(mar = c(1.1, 1.1, 1.1, 1.1))
+ spm( leafshape[c(1:3)],pch = c(16, 16), diagonal = "histogram",smoother = FALSE, reg.line = FALSE,groups = leafshape$arch )
+# dplyr::select(leafshape, c(1:3))
+```
+
+```{r fig.width=5,fig.height=5,fig.align='center'}
+library(car)
+data(leafshape, package="DAAG")
+#data(bank, package = "gclus")
+par(mar = c(1.1, 1.1, 1.1, 1.1))
+ spm( leafshape[c(7:5)],pch = c(16, 16), diagonal = "histogram",smoother = FALSE, reg.line = FALSE,groups = leafshape$arch )
+# dplyr::select(leafshape, c(1:3))
+```
+
+By doing this, we can now observe two clusters formed, based on the arch variable, for each scatterplot in the matrix.
+
+
+### Exercise 8. Olive oils from Italy
+
+![](./exercises/exercise_2_8.PNG)
+
+(a\) Scatterplot matrix of the eight continuous variables representing fatty acids:
+
+```{r fig.width=10,fig.align='center'}
+library(GGally)
+library(ggplot2)
+data(olive, package="zenplots")
+#summary(olive)
+
+ggpairs(olive[,c(3:10)], title="Olive acids", diag=list(continuous='density'), axisLabels='none')
+#pairs(olive)
+```
+
+- The acids that are strongly positively associated are *palmitic* and *palmitoleic*.
+- The acids that are strongly negatively associated are *palmitic* and *oleic* or *palmitoleic* and *oleic*.
+
+(b\) 
+There might be some outliers depending on different variables:
+
+- *stearic*, we have outliers for higher values on the x-axis when plotting against all other variables;
+- there is one outlier in every plot of *palmitic* against all of the other variables (column one of the matrix), usually with a lower value on the x-axis (excepting the one in the plot against the oleic variable, where they are negatively associated);
+- there is one outlier in every plot of *oleic* against all of the other variables (column four of the matrix), usually with a higher value on the x-axis (excepting the first three variables);
+- there are 2-3 outliers for every plot of *linolenic* variable against the others, for high values.
+
+Other obsevations:
+
+- For the plots against the *eicosenoic* variable we can see that the value that appears most often in the set of data (value called *mode*) is 0, because most values have the Y coordinate equal to 0. 
+- For the *linolenic* variable we can observe some gap intervals in the distribution of Y, especially for lower values;
+
+
+### Exercise 9. Boston housing 
+
+<center>
+![](./exercises/exercise_2_9.PNG)
+</center>
+
+(a\) Splom of all continous variables, excepting *chas*:
+
+```{r fig.width=16,fig.height=10,fig.align='center'}
+library(GGally)
+library(ggplot2)
+data(Boston, package="MASS")
+#print(Boston)
+ggpairs(Boston[,-c(4)], title="Boston housing", diag=list(continuous='density'), axisLabels='none')
+
+```
+Variables that are positively associated with *medv* are: **rm**.
+
+(b\) Several scatterplots involving the variable *crim* have an unusual form, because some of the other variables have constant values in most cases. 
+    For example the *ptratio* has values only in a determined range.
+
+(c\)
 
 
 
