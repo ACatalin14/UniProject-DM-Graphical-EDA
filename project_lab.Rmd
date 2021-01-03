@@ -179,6 +179,8 @@ hist(CHAIN$log_virus[CHAIN$log_virus != 0],
      main = 'Histogram of virus cases without 0s',
      ylab = 'Nr.')
 ```
+
+
 ### Exercise 7. Diamonds
 
 ![](./exercises/exercise_1_7.jpg)
@@ -515,6 +517,7 @@ ggparcoord(data = oliveoil, columns=c(3:10), scale="uniminmax", alphaLines=0.2) 
 
 - There are different outliers for the _oleic_ & _linolenic_ variables with higher values, and one more outlier for _palmitic_ variable having the lowest value
 - There is a clear negative correlation between _oleic_ and _linoleic_ variables (suggested by the intersection of the lines), and also a not-so-strong negative correlation between _palmitoleic_ and _stearic_
+- There is a clear positive correlation between _palmitic_ and _palmitoleic_ variables (since most of the lines uniting these 2 axis are almost parallel)
 - It looks like for the _linolenic_ variable there are 2 distinct groups of oils in the lowest range (much data concentrated inside the values 0.0, respectively ~0.13, on uniminmax scale) and one more larger group (ranging from 0.25 to 0.75 values)
 - There is a group of oils which owns its _eicosenoic_ values in the lowest range, while the other groups are ranging from 0.13 to 0.75
 
@@ -532,9 +535,23 @@ ggparcoord(data = oliveoil, columns=c(3:10), scale="uniminmax",
 - Maybe in this dataset the most oils are from Apulia.south since there are way too many observations compared to other regions
 - Sardinia.inland (pale green) and Sardinia.coast (light blue) tend to have the same values across all the variables (as expected, since those oils come from same bigger region - Sardinia)
 
-(c\) 
+(c\) For the scatterplot matrix down below:
 
-### TODO: Dupa ce Larisa rezolva Ex 8 Chapter 5, compar cu rezultatele ei
+- we can easily see the correlations between other variables as well
+- we can immediately check the density distribution of each variable individually
+- it is a little more difficult to spot the outliers on all the variables at once
+- it cannot take into account other feature analysis like the oil's region
+
+While for a pcp:
+
+- it is helpful for cluster analysis, where we used to bring out the oils by their regions
+- it is easier to spot the outliers just by looking at the profiles which are further away than all the other profiles
+- we can observe only the correlations between any 2 adjacent axis (variables), instead of spotting all the possible pairs how it would have been done in a scatterplot. So this way we might miss relevant information regarding possible strongly correlated variables
+- it is harder to estimate the distribution of a variable just by looking at its points along the vertical axis
+
+```{r fig.width=10,fig.align='center'}
+ggpairs(oliveoil[,c(3:10)], title="Olive acids", diag=list(continuous='density'), axisLabels='none')
+```
 
 
 
